@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-service
+  namespace: microservices
+  labels:
+    app: product-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-service
+  template:
+    metadata:
+      labels:
+        app: product-service
+    spec:
+      serviceAccountName: user-service-sa
+      containers:
+        # --- Spring Boot microservice ---
+        - name: product-service
+          image: asia-south1-docker.pkg.dev/agile-earth-477112-t9/microservices/product-service:0.1.6
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8081
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://127.0.0.1:3306/productdb
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials-product
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials-product
+                  key: password
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+          readinessProbe:
+            httpGet:
+              path: /product/actuator/health
+              port: 8081
+            initialDelaySeconds: 20
+            timeoutSeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /product/actuator/health
+              port: 8081
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+            periodSeconds: 20
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /product/actuator/health
+              port: 8081
+            timeoutSeconds: 5
+            periodSeconds: 10
+            failureThreshold: 30
+
+        # --- Cloud SQL Proxy Sidecar ---
+        - name: cloud-sql-proxy
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.11.3
+          args:
+            - "--port=3306"
+            - "agile-earth-477112-t9:asia-south1:online-ordering-mysql"
+          volumeMounts:
+            - name: cloudsql-sa-key
+              mountPath: /secrets
+              readOnly: true
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /secrets/key.json
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+      volumes:
+        - name: cloudsql-sa-key
+          secret:
+            secretName: cloudsql-sa-key

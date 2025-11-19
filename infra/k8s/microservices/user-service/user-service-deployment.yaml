@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  namespace: microservices
+  labels:
+    app: user-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      serviceAccountName: user-service-sa
+      containers:
+        # --- Spring Boot microservice ---
+        - name: user-service
+          image: asia-south1-docker.pkg.dev/agile-earth-477112-t9/microservices/user-service:0.1.9
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://127.0.0.1:3306/userdb
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials-user
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials-user
+                  key: password
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+          readinessProbe:
+            httpGet:
+              path: /user/actuator/health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /user/actuator/health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /user/actuator/health
+              port: 8080
+            timeoutSeconds: 5
+            periodSeconds: 10
+            failureThreshold: 30
+
+        # --- Cloud SQL Proxy Sidecar ---
+        - name: cloud-sql-proxy
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.11.3
+          args:
+            - "--port=3306"
+            - "agile-earth-477112-t9:asia-south1:online-ordering-mysql"
+          volumeMounts:
+            - name: cloudsql-sa-key
+              mountPath: /secrets
+              readOnly: true
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /secrets/key.json
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+      volumes:
+        - name: cloudsql-sa-key
+          secret:
+            secretName: cloudsql-sa-key

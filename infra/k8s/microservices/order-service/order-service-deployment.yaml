@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: microservices
+  labels:
+    app: order-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      serviceAccountName: user-service-sa
+      containers:
+        # --- Spring Boot microservice ---
+        - name: order-service
+          image: asia-south1-docker.pkg.dev/agile-earth-477112-t9/microservices/order-service:0.1.6
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8082
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://127.0.0.1:3306/orderdb
+            - name: PRODUCT_SERVICE_URL
+              value: http://product-service:8081/product/api/products
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials-order
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials-order
+                  key: password
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq.microservices.svc.cluster.local
+            - name: SPRING_RABBITMQ_PORT
+              value: "5672"
+            - name: SPRING_RABBITMQ_USERNAME
+              value: user
+            - name: SPRING_RABBITMQ_PASSWORD
+              value: password
+            - name: SPRING_RABBITMQ_VIRTUAL_HOST
+              value: my_vhost
+          readinessProbe:
+            httpGet:
+              path: /order/actuator/health
+              port: 8082
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /order/actuator/health
+              port: 8082
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /order/actuator/health
+              port: 8082
+            timeoutSeconds: 5
+            periodSeconds: 10
+            failureThreshold: 30
+
+        # --- Cloud SQL Proxy Sidecar ---
+        - name: cloud-sql-proxy
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.11.3
+          args:
+            - "--port=3306"
+            - "agile-earth-477112-t9:asia-south1:online-ordering-mysql"
+          volumeMounts:
+            - name: cloudsql-sa-key
+              mountPath: /secrets
+              readOnly: true
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /secrets/key.json
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+      volumes:
+        - name: cloudsql-sa-key
+          secret:
+            secretName: cloudsql-sa-key
