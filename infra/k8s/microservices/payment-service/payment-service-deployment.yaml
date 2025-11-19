@@ -23,9 +23,17 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8083
+          # resources:
+          #   requests:
+          #     cpu: "100m"
+          #     memory: "256Mi"
+          #   limits:
+          #     cpu: "300m"
+          #     memory: "512Mi"
+          envFrom:
+            - configMapRef:
+                name: payment-service-config
           env:
-            - name: SPRING_DATASOURCE_URL
-              value: jdbc:mysql://127.0.0.1:3306/paymentdb
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -36,18 +44,17 @@ spec:
                 secretKeyRef:
                   name: db-credentials-payment
                   key: password
-            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
-              value: update
-            - name: SPRING_RABBITMQ_HOST
-              value: rabbitmq.microservices.svc.cluster.local
-            - name: SPRING_RABBITMQ_PORT
-              value: "5672"
             - name: SPRING_RABBITMQ_USERNAME
-              value: user
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-credentials
+                  key: username
+
             - name: SPRING_RABBITMQ_PASSWORD
-              value: password
-            - name: SPRING_RABBITMQ_VIRTUAL_HOST
-              value: my_vhost
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-credentials
+                  key: password
           readinessProbe:
             httpGet:
               path: /payment/actuator/health
@@ -76,6 +83,13 @@ spec:
           args:
             - "--port=3306"
             - "agile-earth-477112-t9:asia-south1:online-ordering-mysql"
+          # resources:
+          #   requests:
+          #     cpu: "50m"
+          #     memory: "64Mi"
+          #   limits:
+          #     cpu: "200m"
+          #     memory: "256Mi"
           volumeMounts:
             - name: cloudsql-sa-key
               mountPath: /secrets

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: product-service-config
+  namespace: microservices
+data:
+  SPRING_DATASOURCE_URL: "jdbc:mysql://127.0.0.1:3306/productdb"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "update"

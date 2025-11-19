@@ -23,9 +23,17 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8081
+          # resources:
+          #   requests:
+          #     cpu: "100m"
+          #     memory: "256Mi"
+          #   limits:
+          #     cpu: "300m"
+          #     memory: "512Mi"
+          envFrom:
+            - configMapRef:
+                name: product-service-config
           env:
-            - name: SPRING_DATASOURCE_URL
-              value: jdbc:mysql://127.0.0.1:3306/productdb
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -36,8 +44,6 @@ spec:
                 secretKeyRef:
                   name: db-credentials-product
                   key: password
-            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
-              value: update
           readinessProbe:
             httpGet:
               path: /product/actuator/health
@@ -68,6 +74,13 @@ spec:
           args:
             - "--port=3306"
             - "agile-earth-477112-t9:asia-south1:online-ordering-mysql"
+          # resources:
+          #   requests:
+          #     cpu: "50m"
+          #     memory: "64Mi"
+          #   limits:
+          #     cpu: "200m"
+          #     memory: "256Mi"
           volumeMounts:
             - name: cloudsql-sa-key
               mountPath: /secrets
