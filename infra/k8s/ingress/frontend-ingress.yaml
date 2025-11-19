@@ -5,15 +5,16 @@ metadata:
   namespace: frontend
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: letsencrypt-production
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
         - nourishnow.duckdns.org
       secretName: frontend-tls
-
   rules:
-    - http:
+    - host: nourishnow.duckdns.org
+      http:
         paths:
           - path: /
             pathType: Prefix

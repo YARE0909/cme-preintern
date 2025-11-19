@@ -3,6 +3,8 @@ kind: Ingress
 metadata:
   name: microservices-ingress
   namespace: microservices
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
 spec:
   ingressClassName: nginx
   tls:
@@ -10,7 +12,8 @@ spec:
         - nourishnow.duckdns.org
       secretName: microservices-tls
   rules:
-    - http:
+    - host: nourishnow.duckdns.org
+      http:
         paths:
           - path: /user
             pathType: Prefix
