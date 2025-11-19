@@ -70,25 +70,22 @@ export default function AdminUsersPage() {
     id: null as number | null,
   });
 
-  // --------------------------------------------------------
-  // LOAD USERS
-  // --------------------------------------------------------
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
+  async function load() {
+    setLoading(true);
 
-      const res = await apiClient.get("/user/api/users");
+    const res = await apiClient.get("/user/api/users");
 
-      if (!res.success) {
-        console.error(res.error);
-        setLoading(false);
-        return;
-      }
-
-      setUsers(res.data || []);
+    if (!res.success) {
+      console.error(res.error);
       setLoading(false);
+      return;
     }
 
+    setUsers(res.data || []);
+    setLoading(false);
+  }
+
+  useEffect(() => {
     load();
   }, []);
 
@@ -104,9 +101,7 @@ export default function AdminUsersPage() {
             String(u.id).includes(search)
           : true
       )
-      .filter((u) =>
-        roleFilter === "ALL" ? true : u.role === roleFilter
-      );
+      .filter((u) => (roleFilter === "ALL" ? true : u.role === roleFilter));
   }, [users, search, roleFilter]);
 
   if (loading) return <Loader />;
@@ -166,7 +161,7 @@ export default function AdminUsersPage() {
     if (drawerMode === "add") {
       const res = await apiClient.post("/user/api/users/register", payload);
       if (res.success) {
-        setUsers((prev) => [...prev, res.data]);
+        await load();
         setDrawerOpen(false);
       }
     }
@@ -178,9 +173,7 @@ export default function AdminUsersPage() {
       );
 
       if (res.success) {
-        setUsers((prev) =>
-          prev.map((u) => (u.id === selectedUser.id ? res.data : u))
-        );
+        await load();
         setDrawerOpen(false);
       }
     }
@@ -291,9 +284,7 @@ export default function AdminUsersPage() {
                     <Edit size={18} />
                   </button>
                   <button
-                    onClick={() =>
-                      setDeleteModal({ open: true, id: u.id })
-                    }
+                    onClick={() => setDeleteModal({ open: true, id: u.id })}
                     className="p-2 bg-red-900/30 hover:bg-red-900/50 rounded-lg text-red-400 cursor-pointer"
                   >
                     <Trash2 size={18} />
@@ -477,9 +468,7 @@ export default function AdminUsersPage() {
                   <select
                     className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-xl text-gray-200"
                     value={form.role}
-                    onChange={(e) =>
-                      setForm({ ...form, role: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, role: e.target.value })}
                   >
                     <option value="USER">USER</option>
                     <option value="ADMIN">ADMIN</option>
@@ -505,12 +494,8 @@ export default function AdminUsersPage() {
       {deleteModal.open && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm z-50">
           <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl w-96 text-center shadow-xl">
-            <h3 className="text-xl text-white font-bold">
-              Delete this user?
-            </h3>
-            <p className="text-gray-400 mt-2">
-              This action cannot be undone.
-            </p>
+            <h3 className="text-xl text-white font-bold">Delete this user?</h3>
+            <p className="text-gray-400 mt-2">This action cannot be undone.</p>
 
             <div className="flex justify-center gap-4 mt-6">
               <button

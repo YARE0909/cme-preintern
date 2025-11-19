@@ -61,47 +61,44 @@ export default function AdminOrdersPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  // --------------------------------------------------------
-  // LOAD PRODUCTS + ORDERS + USER DATA
-  // --------------------------------------------------------
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
+  async function load() {
+    setLoading(true);
 
-      const orderRes = await apiClient.get("/order/api/orders");
-      const productRes = await apiClient.get("/product/api/products");
-      const allUsersRes = await apiClient.get("/user/api/users");
+    const orderRes = await apiClient.get("/order/api/orders");
+    const productRes = await apiClient.get("/product/api/products");
+    const allUsersRes = await apiClient.get("/user/api/users");
 
-      if (!orderRes.success || !productRes.success || !allUsersRes.success) {
-        toast.error("Failed to load admin order data");
-        setLoading(false);
-        return;
-      }
-
-      // Build Product Map
-      const productMap = new Map(
-        productRes.data.map((p: Product) => [p.id, p.imageUrl])
-      );
-
-      // Build User Map
-      const uMap = new Map<number, UserInfo>();
-      allUsersRes.data.forEach((u: UserInfo) => uMap.set(u.id, u));
-      setUserMap(uMap);
-
-      // Attach product image
-      const enrichedOrders = orderRes.data.map((o: Order) => ({
-        ...o,
-        items: o.items.map((i) => ({
-          ...i,
-          imageUrl: productMap.get(i.productId) || "/placeholder.jpg",
-        })),
-      }));
-
-      setOrders(enrichedOrders);
-      setProducts(productRes.data);
+    if (!orderRes.success || !productRes.success || !allUsersRes.success) {
+      toast.error("Failed to load admin order data");
       setLoading(false);
+      return;
     }
 
+    // Build Product Map
+    const productMap = new Map(
+      productRes.data.map((p: Product) => [p.id, p.imageUrl])
+    );
+
+    // Build User Map
+    const uMap = new Map<number, UserInfo>();
+    allUsersRes.data.forEach((u: UserInfo) => uMap.set(u.id, u));
+    setUserMap(uMap);
+
+    // Attach product image
+    const enrichedOrders = orderRes.data.map((o: Order) => ({
+      ...o,
+      items: o.items.map((i) => ({
+        ...i,
+        imageUrl: productMap.get(i.productId) || "/placeholder.jpg",
+      })),
+    }));
+
+    setOrders(enrichedOrders);
+    setProducts(productRes.data);
+    setLoading(false);
+  }
+
+  useEffect(() => {
     load();
   }, []);
 

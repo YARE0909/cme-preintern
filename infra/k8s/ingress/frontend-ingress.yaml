@@ -7,6 +7,11 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - nourishnow.duckdns.org
+      secretName: frontend-tls
+
   rules:
     - http:
         paths:

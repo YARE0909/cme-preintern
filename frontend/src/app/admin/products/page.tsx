@@ -59,24 +59,21 @@ export default function AdminProductsPage() {
     imageUrl: "",
   });
 
-  // --------------------------------------------------------
-  // LOAD PRODUCTS
-  // --------------------------------------------------------
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
-      const res = await apiClient.get("/product/api/products");
+  async function load() {
+    setLoading(true);
+    const res = await apiClient.get("/product/api/products");
 
-      if (!res.success) {
-        toast.error("Failed to load products");
-        setLoading(false);
-        return;
-      }
-
-      setProducts(res.data || []);
+    if (!res.success) {
+      toast.error("Failed to load products");
       setLoading(false);
+      return;
     }
 
+    setProducts(res.data || []);
+    setLoading(false);
+  }
+
+  useEffect(() => {
     load();
   }, []);
 
@@ -94,7 +91,13 @@ export default function AdminProductsPage() {
   // --------------------------------------------------------
   const openAdd = () => {
     setDrawerMode("add");
-    setForm({ name: "", description: "", price: "", category: "", imageUrl: "" });
+    setForm({
+      name: "",
+      description: "",
+      price: "",
+      category: "",
+      imageUrl: "",
+    });
     setDrawerOpen(true);
   };
 
@@ -147,6 +150,7 @@ export default function AdminProductsPage() {
         setProducts((prev) =>
           prev.map((p) => (p.id === currentProduct?.id ? res.data : p))
         );
+        load();
       } else toast.error(res.error || "Failed to update product");
     }
 

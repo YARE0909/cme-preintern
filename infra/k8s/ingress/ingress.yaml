@@ -5,6 +5,10 @@ metadata:
   namespace: microservices
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - nourishnow.duckdns.org
+      secretName: microservices-tls
   rules:
     - http:
         paths:

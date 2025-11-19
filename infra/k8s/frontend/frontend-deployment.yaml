@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: asia-south1-docker.pkg.dev/agile-earth-477112-t9/frontend/app:0.5
+          image: asia-south1-docker.pkg.dev/agile-earth-477112-t9/frontend/app:0.6
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
@@ -23,5 +23,5 @@ spec:
             - name: NODE_ENV
               value: "production"
             - name: NEXT_PUBLIC_API_URL
-              value: "http://136.115.219.35"
+              value: "https://nourishnow.duckdns.org"
       restartPolicy: Always
