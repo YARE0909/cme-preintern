@@ -76,7 +76,7 @@ export default function PaymentPage() {
   }
 
   return (
-    <div className="h-screen flex items-center justify-center bg-linear-to-b from-black via-zinc-950 to-zinc-900">
+    <div className="h-screen flex items-center justify-center bg-linear-to-b from-black via-zinc-950 to-zinc-900 mb-20">
       <div className="w-full max-w-xl bg-zinc-900/80 backdrop-blur-xl border border-zinc-800 rounded-3xl py-8 px-4 shadow-[0_0_40px_rgba(0,0,0,0.45)] space-y-5">
         {/* HEADER */}
         <div className="text-center space-y-1">

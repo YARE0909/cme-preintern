@@ -222,7 +222,7 @@ export default function OrderDetailsPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto py-10 space-y-8">
+    <div className="max-w-5xl mx-auto py-10 space-y-8 mb-20">
       <div className="flex flex-col md:flex md:flex-row items-start justify-between gap-6">
         <div>
           <h1 className="text-3xl font-extrabold text-white tracking-tight">

@@ -148,7 +148,7 @@ export default function PaymentsPage() {
         <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6 backdrop-blur-xl shadow-xl">
           <p className="text-gray-400 text-sm mb-2">Last Successful Payment</p>
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex md:flex-row md:items-center justify-between gap-4">
             <div>
               <p className="text-white text-xl font-bold">
                 ₹{lastSuccess.amount}
@@ -160,9 +160,9 @@ export default function PaymentsPage() {
 
             <Link
               href={`/dashboard/orders/${lastSuccess.orderId}`}
-              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 shadow-md cursor-pointer font-bold"
+              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center gap-2 shadow-md cursor-pointer font-bold"
             >
-              View Order <ArrowRight size={16} />
+              View Order
             </Link>
           </div>
         </div>

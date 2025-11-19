@@ -123,7 +123,7 @@ export default function OrdersPage() {
           className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition font-bold cursor-pointer flex items-center gap-2"
         >
           <Plus className="inline-block" size={20} />
-          Place New Order
+          New Order
         </Link>
       </div>
 

@@ -128,7 +128,7 @@ export default function DashboardPage() {
   /* RESPONSIVE UI START */
   /* -------------------------------------------------- */
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-10 mb-20">
+    <div className="md:max-w-5xl mx-auto md:px-4 sm:px-6 py-8 sm:py-12 space-y-10 mb-20">
       {/* HERO SECTION */}
       <div
         className="
@@ -260,7 +260,7 @@ export default function DashboardPage() {
 
       {/* CART DRAWER */}
       {cartOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-end sm:justify-end z-50">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-end sm:justify-end z-200">
           <div className="w-full sm:w-96 h-full bg-zinc-900 border-l border-zinc-800 shadow-xl flex flex-col animate-slideIn">
             {/* HEADER */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-800">

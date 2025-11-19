@@ -31,7 +31,7 @@ export default function CheckoutPage() {
 
   if (!cart || cart.length === 0) {
     return (
-      <div className="w-full h-screen flex flex-col items-center justify-center text-gray-400 p-6 text-center">
+      <div className="w-full h-screen flex flex-col items-center justify-center text-gray-400 p-6 text-center mb-20">
         <div className="bg-zinc-900/50 border border-zinc-800 p-10 rounded-3xl shadow-xl flex flex-col items-center gap-4">
           <ShoppingCart className="text-gray-500" size={60} />
 
@@ -94,7 +94,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto py-10 space-y-8">
+    <div className="md:max-w-3xl mx-auto py-10 space-y-8 mb-20">
       {/* HEADER */}
       <div className="bg-zinc-900/60 border border-zinc-800 rounded-3xl shadow-xl p-8 backdrop-blur-lg">
         <h1 className="text-3xl font-bold text-white tracking-tight">

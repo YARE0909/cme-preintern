@@ -128,7 +128,7 @@ export default function NewOrderPage() {
   // UI STARTS HERE
   // ---------------------------------------------
   return (
-    <div className="max-w-7xl mx-auto py-10 space-y-10">
+    <div className="max-w-7xl mx-auto py-10 space-y-10 mb-20">
       {/* ------------------------------------------------ */}
       {/* TOP: HEADER + CART BUTTON */}
       {/* ------------------------------------------------ */}
@@ -200,7 +200,7 @@ export default function NewOrderPage() {
       {/* ------------------------------------------------ */}
       {/* CART DRAWER */}
       {cartOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-end z-50">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-end z-200">
           {/* SLIDE PANEL */}
           <div
             className="w-96 h-full bg-zinc-900/95 border-l border-zinc-800 shadow-2xl
