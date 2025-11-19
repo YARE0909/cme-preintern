@@ -5,11 +5,9 @@ import { apiClient } from "@/lib/apiClient";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
 import Loader from "@/components/Loader";
-import { Clock, CheckCircle, XCircle, Banknote } from "lucide-react";
+import { Clock, CheckCircle, XCircle, Banknote, Plus, Box } from "lucide-react";
+import { useCart } from "@/context/CartContext";
 
-// ------------------------------
-// TYPES
-// ------------------------------
 type OrderStatus = "PENDING" | "CONFIRMED" | "DELIVERED" | "CANCELLED";
 type PaymentStatus = "PENDING" | "SUCCESS" | "FAILED";
 
@@ -38,9 +36,6 @@ interface Order {
   items: OrderItem[];
 }
 
-// ------------------------------
-// STATUS MAPS
-// ------------------------------
 const ORDER_STATUS_MAP: Record<OrderStatus, string> = {
   PENDING: "text-yellow-300 bg-yellow-500/10 border-yellow-500/20",
   CONFIRMED: "text-blue-300 bg-blue-500/10 border-blue-500/20",
@@ -61,73 +56,84 @@ const STATUS_ICON_MAP: Record<OrderStatus, any> = {
   CANCELLED: XCircle,
 };
 
-// ------------------------------
-// PAGE COMPONENT
-// ------------------------------
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useCart();
+
+  async function load() {
+    setLoading(true);
+
+    console.log({ user });
+
+    const [ordersRes, productsRes] = await Promise.all([
+      apiClient.get(`/order/api/orders/user/${user.id}`),
+      apiClient.get("/product/api/products"),
+    ]);
+
+    if (!ordersRes.success) {
+      toast.error("Failed to load orders");
+      setLoading(false);
+      return;
+    }
+
+    const orderData = ordersRes.data as Order[];
+    console.log({ orderData });
+    const productData = productsRes.success
+      ? (productsRes.data as Product[])
+      : [];
+
+    // Map product images to items
+    const productMap = new Map<string, string>();
+    productData.forEach((p) =>
+      productMap.set(p.id, p.imageUrl || "/placeholder.jpg")
+    );
+
+    const enrichedOrders = orderData.map((order) => ({
+      ...order,
+      items: order.items.map((i) => ({
+        ...i,
+        imageUrl: productMap.get(i.productId) || "/placeholder.jpg",
+      })),
+    }));
+
+    setOrders(enrichedOrders);
+    setLoading(false);
+  }
 
   // Fetch orders + product images
   useEffect(() => {
-    async function load() {
-      setLoading(true);
-
-      const [ordersRes, productsRes] = await Promise.all([
-        apiClient.get("/order/api/orders"),
-        apiClient.get("/product/api/products"),
-      ]);
-
-      if (!ordersRes.success) {
-        toast.error("Failed to load orders");
-        setLoading(false);
-        return;
-      }
-
-      const orderData = ordersRes.data as Order[];
-      const productData = productsRes.success ? (productsRes.data as Product[]) : [];
-
-      // Map product images to items
-      const productMap = new Map<string, string>();
-      productData.forEach((p) => productMap.set(p.id, p.imageUrl || "/placeholder.jpg"));
-
-      const enrichedOrders = orderData.map((order) => ({
-        ...order,
-        items: order.items.map((i) => ({
-          ...i,
-          imageUrl: productMap.get(i.productId) || "/placeholder.jpg",
-        })),
-      }));
-
-      setOrders(enrichedOrders);
-      setProducts(productData);
-      setLoading(false);
+    if (user) {
+      load();
     }
-
-    load();
-  }, []);
+  }, [user]);
 
   if (loading) return <Loader />;
 
   return (
     <div className="space-y-10 py-10 max-w-6xl mx-auto mb-20">
-
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-semibold text-white tracking-tight">Your Orders</h1>
+        <h1 className="text-3xl font-semibold text-white tracking-tight">
+          Your Orders
+        </h1>
 
         <Link
           href="/dashboard/orders/new"
-          className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition font-bold cursor-pointer"
+          className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition font-bold cursor-pointer flex items-center gap-2"
         >
+          <Plus className="inline-block" size={20} />
           Place New Order
         </Link>
       </div>
 
       {/* Empty state */}
       {orders.length === 0 && (
-        <div className="text-gray-400 text-lg">No orders yet — place your first order.</div>
+        <div className="flex flex-col items-center justify-center py-12 px-4 text-center text-gray-500">
+          <Box className="w-16 h-16 mb-4 stroke-current text-gray-300" />
+          <h2 className="text-2xl font-semibold mb-2">No orders yet</h2>
+          <p className="text-lg mb-4">Place your first order to get started.</p>
+        </div>
       )}
 
       {/* Orders Grid */}
@@ -171,17 +177,20 @@ export default function OrdersPage() {
 
                 {/* Status Section */}
                 <div className="mt-4 flex items-center justify-between">
-
                   {/* Order status */}
                   <span
-                    className={`px-3 py-1 text-xs rounded-lg border flex items-center gap-1 ${ORDER_STATUS_MAP[order.status]}`}
+                    className={`px-3 py-1 text-xs rounded-lg border flex items-center gap-1 ${
+                      ORDER_STATUS_MAP[order.status]
+                    }`}
                   >
                     <StatusIcon size={12} /> {order.status}
                   </span>
 
                   {/* Payment status */}
                   <span
-                    className={`px-3 py-1 text-xs rounded-lg border flex items-center gap-1 ${PAYMENT_STATUS_MAP[order.paymentStatus]}`}
+                    className={`px-3 py-1 text-xs rounded-lg border flex items-center gap-1 ${
+                      PAYMENT_STATUS_MAP[order.paymentStatus]
+                    }`}
                   >
                     <Banknote size={14} />
                     {order.paymentStatus}

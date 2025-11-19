@@ -19,7 +19,7 @@ spec:
       containers:
         # --- Spring Boot microservice ---
         - name: payment-service
-          image: asia-south1-docker.pkg.dev/agile-earth-477112-t9/microservices/payment-service:0.1.4
+          image: asia-south1-docker.pkg.dev/agile-earth-477112-t9/microservices/payment-service:0.1.7
           imagePullPolicy: Always
           ports:
             - containerPort: 8083

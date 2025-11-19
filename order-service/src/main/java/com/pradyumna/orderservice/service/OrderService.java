@@ -114,6 +114,10 @@ public class OrderService {
                 .orElseThrow(() -> new OrderNotFoundException("Order with ID " + id + " not found")));
     }
 
+    public List<Order> getOrdersByUserId(Long userId) {
+        return orderRepository.findByUserId(userId);
+    }
+
     // ---------------------------------------------------
     // ✅ UPDATE ORDER STATUS
     // ---------------------------------------------------

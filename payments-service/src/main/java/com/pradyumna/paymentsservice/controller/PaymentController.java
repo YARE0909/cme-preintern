@@ -37,14 +37,12 @@ public class PaymentController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /**
-     * Simulate a user completing a payment. Body example:
-     * {
-     *   "status": "SUCCESS"   // or "FAILED"
-     * }
-     *
-     * Example: POST /api/payments/{paymentReferenceId}/pay
-     */
+    @GetMapping("/user/{id}")
+    public ResponseEntity<List<Payment>> getByUserId(@PathVariable Long id) {
+        List<Payment> payments = paymentRepository.findByUserId(id);
+        return ResponseEntity.ok(payments);
+    }
+
     @PostMapping("/pay")
     public ResponseEntity<Payment> simulatePayment(
             @RequestParam UUID orderId) {

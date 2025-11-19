@@ -5,7 +5,15 @@ import { apiClient } from "@/lib/apiClient";
 import { loadCart, saveCart, clearCart, CartItem } from "@/lib/cart";
 import { decodeJwt, getAuthToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { Search, ShoppingCart, X, Plus, Minus, Trash2 } from "lucide-react";
+import {
+  Search,
+  ShoppingCart,
+  X,
+  Plus,
+  Minus,
+  Trash2,
+  UtensilsCrossed,
+} from "lucide-react";
 import Loader from "@/components/Loader";
 import toast from "react-hot-toast";
 import { useCart } from "@/context/CartContext";
@@ -171,7 +179,7 @@ export default function DashboardPage() {
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {recommended.map((p) => (
+        {recommended.slice(0, 6).map((p) => (
           <div
             key={p.id}
             className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-3
@@ -189,7 +197,7 @@ export default function DashboardPage() {
                 className="mt-2 w-fit px-4 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-700 
                  text-white font-bold text-xs cursor-pointer"
               >
-                ADD
+                Add To Cart
               </button>
             </div>
             <div className="w-20 h-20 rounded-xl overflow-hidden bg-zinc-800 border border-zinc-700">
@@ -233,8 +241,11 @@ export default function DashboardPage() {
             <img src={p.imageUrl} className="w-full h-48 object-cover" />
 
             <div className="p-5 space-y-2">
-              <p className="text-xl font-semibold text-white">{p.name}</p>
-              <p className="text-gray-400 text-sm">₹{p.price}</p>
+              <div className="flex flex-col">
+                <p className="text-xl font-semibold text-white">{p.name}</p>
+                <p className="text-gray-400 text-sm">{p.description}</p>
+              </div>
+              <p className="text-gray-400 font-bold">₹{p.price}</p>
 
               <button
                 onClick={() => addToCart(p)}
@@ -256,7 +267,7 @@ export default function DashboardPage() {
               <h2 className="text-xl font-semibold text-white">Your Cart</h2>
               <button
                 onClick={() => setCartOpen(false)}
-                className="text-gray-400 hover:text-white"
+                className="text-gray-400 hover:text-white cursor-pointer"
               >
                 <X size={24} />
               </button>
@@ -265,9 +276,13 @@ export default function DashboardPage() {
             {/* ITEMS */}
             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
               {cart.length === 0 ? (
-                <p className="text-gray-500 text-center mt-10 text-sm">
-                  Your cart is empty
-                </p>
+                <div className="flex flex-col items-center text-center mt-10">
+                  <UtensilsCrossed size={40} className="text-gray-500 mb-3" />
+                  <p className="text-gray-300 text-sm">Your cart is empty</p>
+                  <p className="text-gray-500 text-xs mt-1">
+                    Hungry? Add something tasty!
+                  </p>
+                </div>
               ) : (
                 cart.map((it) => (
                   <div
@@ -288,7 +303,7 @@ export default function DashboardPage() {
                           onClick={() =>
                             updateQty(it.productId, it.quantity - 1)
                           }
-                          className="w-6 h-6 bg-zinc-700 hover:bg-zinc-600 rounded-md flex items-center justify-center"
+                          className="w-6 h-6 bg-zinc-700 hover:bg-zinc-600 rounded-md flex items-center justify-center cursor-pointer"
                         >
                           <Minus size={16} />
                         </button>
@@ -301,7 +316,7 @@ export default function DashboardPage() {
                           onClick={() =>
                             updateQty(it.productId, it.quantity + 1)
                           }
-                          className="w-6 h-6 bg-zinc-700 hover:bg-zinc-600 rounded-md flex items-center justify-center"
+                          className="w-6 h-6 bg-zinc-700 hover:bg-zinc-600 rounded-md flex items-center justify-center cursor-pointer"
                         >
                           <Plus size={16} />
                         </button>
@@ -310,7 +325,7 @@ export default function DashboardPage() {
 
                     <button
                       onClick={() => removeItem(it.productId)}
-                      className="text-red-400 hover:text-red-300"
+                      className="text-red-400 hover:text-red-300 cursor-pointer"
                     >
                       <Trash2 size={18} />
                     </button>
@@ -343,7 +358,7 @@ export default function DashboardPage() {
 
               <button
                 onClick={goToCheckout}
-                className="w-full mt-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg"
+                className="w-full mt-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg cursor-pointer"
               >
                 Proceed to Checkout
               </button>

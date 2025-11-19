@@ -39,7 +39,7 @@ export default function RegisterPage() {
         role: "USER",
       };
 
-      const res = await apiClient.post("/api/users/register", payload);
+      const res = await apiClient.post("/user/api/users/register", payload);
       const { status, data, success } = res;
 
       if (status === 200 && success) {

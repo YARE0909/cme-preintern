@@ -5,7 +5,16 @@ import { apiClient } from "@/lib/apiClient";
 import { toast } from "react-hot-toast";
 import { loadCart, saveCart, CartItem, clearCart } from "@/lib/cart";
 import { useRouter } from "next/navigation";
-import { Search, X, ShoppingCart, Trash2, Minus, Plus } from "lucide-react";
+import {
+  Search,
+  X,
+  ShoppingCart,
+  Trash2,
+  Minus,
+  Plus,
+  Package,
+  UtensilsCrossed,
+} from "lucide-react";
 import Loader from "@/components/Loader";
 import { useCart } from "@/context/CartContext";
 
@@ -166,8 +175,14 @@ export default function NewOrderPage() {
             />
 
             <div className="p-4">
-              <p className="text-white font-medium truncate">{p.name}</p>
-              <p className="text-gray-400 text-sm mt-1">₹{p.price}</p>
+              <p className="text-white font-bold truncate">{p.name}</p>
+              <p
+                className="text-gray-400 text-sm truncate"
+                title={p.description}
+              >
+                {p.description}
+              </p>
+              <p className="text-gray-400 mt-1 font-bold">₹{p.price}</p>
 
               <button
                 onClick={() => addToCart(p)}
@@ -196,7 +211,7 @@ export default function NewOrderPage() {
               <h2 className="text-xl font-semibold text-white">Your Cart</h2>
               <button
                 onClick={() => setCartOpen(false)}
-                className="text-gray-400 hover:text-white transition"
+                className="text-gray-400 hover:text-white transition cursor-pointer"
               >
                 <X size={24} />
               </button>
@@ -205,9 +220,13 @@ export default function NewOrderPage() {
             {/* ITEMS LIST */}
             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
               {cart.length === 0 ? (
-                <p className="text-gray-500 text-center mt-10 text-sm">
-                  Your cart is empty
-                </p>
+                <div className="flex flex-col items-center text-center mt-10">
+                  <UtensilsCrossed size={40} className="text-gray-500 mb-3" />
+                  <p className="text-gray-300 text-sm">Your cart is empty</p>
+                  <p className="text-gray-500 text-xs mt-1">
+                    Hungry? Add something tasty!
+                  </p>
+                </div>
               ) : (
                 cart.map((it) => (
                   <div

@@ -19,7 +19,7 @@ spec:
       containers:
         # --- Spring Boot microservice ---
         - name: order-service
-          image: asia-south1-docker.pkg.dev/agile-earth-477112-t9/microservices/order-service:0.1.6
+          image: asia-south1-docker.pkg.dev/agile-earth-477112-t9/microservices/order-service:0.1.10
           imagePullPolicy: Always
           ports:
             - containerPort: 8082

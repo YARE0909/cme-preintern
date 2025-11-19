@@ -22,6 +22,7 @@ interface Product {
   id: string;
   name: string;
   price: number;
+  description?: string;
   imageUrl?: string;
   category?: string;
 }
@@ -52,6 +53,7 @@ export default function AdminProductsPage() {
   // Form state
   const [form, setForm] = useState({
     name: "",
+    description: "",
     price: "",
     category: "",
     imageUrl: "",
@@ -92,7 +94,7 @@ export default function AdminProductsPage() {
   // --------------------------------------------------------
   const openAdd = () => {
     setDrawerMode("add");
-    setForm({ name: "", price: "", category: "", imageUrl: "" });
+    setForm({ name: "", description: "", price: "", category: "", imageUrl: "" });
     setDrawerOpen(true);
   };
 
@@ -104,6 +106,7 @@ export default function AdminProductsPage() {
     setCurrentProduct(p);
     setForm({
       name: p.name,
+      description: p.description || "",
       price: String(p.price),
       category: p.category || "",
       imageUrl: p.imageUrl || "",
@@ -117,6 +120,7 @@ export default function AdminProductsPage() {
   const saveProduct = async () => {
     const payload = {
       name: form.name,
+      description: form.description,
       price: Number(form.price),
       category: form.category,
       imageUrl: form.imageUrl,
@@ -236,14 +240,14 @@ export default function AdminProductsPage() {
                 <td className="p-4 flex items-center justify-end gap-3">
                   <button
                     onClick={() => openEdit(p)}
-                    className="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-gray-200"
+                    className="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-gray-200 cursor-pointer"
                   >
                     <Edit size={18} />
                   </button>
 
                   <button
                     onClick={() => setDeleteModal({ open: true, id: p.id })}
-                    className="p-2 rounded-lg bg-red-900/30 hover:bg-red-900/50 text-red-400"
+                    className="p-2 rounded-lg bg-red-900/30 hover:bg-red-900/50 text-red-400 cursor-pointer"
                   >
                     <Trash2 size={18} />
                   </button>
@@ -274,7 +278,7 @@ export default function AdminProductsPage() {
                 </h2>
                 <button
                   onClick={() => setDrawerOpen(false)}
-                  className="text-gray-400 hover:text-gray-200"
+                  className="text-gray-400 hover:text-gray-200 cursor-pointer"
                 >
                   <X size={22} />
                 </button>
@@ -291,6 +295,21 @@ export default function AdminProductsPage() {
                       value={form.name}
                       onChange={(e) =>
                         setForm({ ...form, name: e.target.value })
+                      }
+                      className="w-full bg-transparent outline-none text-gray-200"
+                    />
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="text-gray-400 text-sm">Description</label>
+                  <div className="flex items-center gap-2 bg-zinc-800 p-3 rounded-xl mt-1 border border-zinc-700">
+                    <Tag size={18} className="text-gray-500" />
+                    <input
+                      value={form.description}
+                      onChange={(e) =>
+                        setForm({ ...form, description: e.target.value })
                       }
                       className="w-full bg-transparent outline-none text-gray-200"
                     />

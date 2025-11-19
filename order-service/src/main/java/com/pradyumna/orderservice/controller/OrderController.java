@@ -50,6 +50,12 @@ public class OrderController {
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable Long userId) {
+        List<Order> orders = orderService.getOrdersByUserId(userId);
+        return ResponseEntity.ok(orders);
+    }
+
     // ---------- UPDATE ORDER STATUS ----------
     /**
      * Update the status of an existing order (e.g., PENDING → CONFIRMED → DELIVERED).

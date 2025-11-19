@@ -13,6 +13,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
+import { useCart } from "@/context/CartContext";
 
 // --------------------------------------
 // TYPES
@@ -25,6 +26,8 @@ interface Payment {
   amount: number;
   status: PaymentStatus;
   createdAt: string;
+  paymentReferenceId: string;
+  updatedAt: string;
 }
 
 // --------------------------------------
@@ -42,32 +45,31 @@ const ICON_MAP: Record<PaymentStatus, any> = {
   PENDING: Clock,
 };
 
-// --------------------------------------
-// PAGE
-// --------------------------------------
 export default function PaymentsPage() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useCart();
 
-  // Fetch payments
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
+  async function load() {
+    setLoading(true);
 
-      const res = await apiClient.get("/payment/api/payments");
+    const res = await apiClient.get(`/payment/api/payments/user/${user?.id}`);
 
-      if (!res.success) {
-        toast.error("Failed to load payments");
-        setLoading(false);
-        return;
-      }
-
-      setPayments(res.data || []);
+    if (!res.success) {
+      toast.error("Failed to load payments");
       setLoading(false);
+      return;
     }
 
-    load();
-  }, []);
+    setPayments(res.data || []);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    if (user) {
+      load();
+    }
+  }, [user]);
 
   if (loading) return <Loader />;
 
@@ -172,7 +174,15 @@ export default function PaymentsPage() {
       <div>
         <h2 className="text-2xl font-semibold text-white mb-6">All Payments</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {payments.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-12 px-4 text-center text-gray-500">
+          <Banknote className="w-16 h-16 mb-4 stroke-current text-gray-300" />
+          <h2 className="text-2xl font-semibold mb-2">No payments yet</h2>
+          <p className="text-lg mb-4">Place your first order to get started.</p>
+        </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {payments
             .slice()
             .sort(
@@ -186,11 +196,12 @@ export default function PaymentsPage() {
               return (
                 <div
                   key={p.id}
-                  className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-5 shadow-lg hover:bg-zinc-900 transition backdrop-blur-xl group"
+                  className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6 shadow-lg hover:bg-zinc-900 transition backdrop-blur-xl group"
                 >
-                  <div className="flex items-center justify-between mb-4">
+                  {/* TOP: Status + Date */}
+                  <div className="flex items-center justify-between mb-5">
                     <span
-                      className={`px-3 py-1 text-xs rounded-lg border flex items-center gap-1 ${
+                      className={`px-3 py-1.5 text-xs rounded-lg border flex items-center gap-1.5 font-medium ${
                         PAYMENT_STATUS_MAP[p.status]
                       }`}
                     >
@@ -198,22 +209,61 @@ export default function PaymentsPage() {
                       {p.status}
                     </span>
 
-                    <p className="text-gray-500 text-xs">
+                    <p className="text-gray-500 text-xs flex items-center gap-1">
                       {new Date(p.createdAt).toLocaleDateString()}
                     </p>
                   </div>
 
-                  <p className="text-white text-xl font-semibold">
-                    ₹{p.amount}
-                  </p>
+                  {/* AMOUNT */}
+                  <div className="mb-6">
+                    <p className="text-white text-3xl font-bold">₹{p.amount}</p>
+                    <p className="text-gray-500 text-sm mt-1">Payment Amount</p>
+                  </div>
 
-                  <p className="text-gray-400 text-sm mt-1">
-                    Order #{p.orderId}
-                  </p>
+                  {/* DIVIDER */}
+                  <div className="border-t border-zinc-800 my-4"></div>
 
+                  {/* INFO LIST */}
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-indigo-400"></span>
+                        Order ID
+                      </span>
+                      <span className="text-gray-300 truncate max-w-[60%] text-right">
+                        {p.orderId}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <span className="text-gray-500 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-green-400"></span>
+                        Reference
+                      </span>
+                      <span className="text-gray-300 break-all max-w-[60%] text-right">
+                        {p.paymentReferenceId}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <span className="text-gray-500 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+                        Updated
+                      </span>
+                      <span className="text-gray-300">
+                        {new Date(p.updatedAt).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* DIVIDER */}
+                  <div className="border-t border-zinc-800 mt-6 mb-4"></div>
+
+                  {/* VIEW ORDER BUTTON */}
                   <Link
                     href={`/dashboard/orders/${p.orderId}`}
-                    className="block mt-4 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-center shadow-md transition cursor-pointer font-bold"
+                    className="w-full block px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 
+               text-white text-center shadow-md transition font-semibold"
                   >
                     View Order
                   </Link>
