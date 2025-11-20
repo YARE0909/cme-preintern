@@ -26,9 +26,4 @@ spec:
           #   limits:
           #     cpu: "150m"
           #     memory: "300Mi"
-          env:
-            - name: NODE_ENV
-              value: "production"
-            - name: NEXT_PUBLIC_API_URL
-              value: "https://nourishnow.duckdns.org"
       restartPolicy: Always
