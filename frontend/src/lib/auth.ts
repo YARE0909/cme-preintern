@@ -5,7 +5,7 @@ export const AUTH_COOKIE = "nourishnow_token";
 export function saveAuthToken(token: string) {
   setCookie(null, AUTH_COOKIE, token, {
     path: "/",
-    maxAge: 60 * 60 * 24 * 7, // 7 days
+    maxAge: 60 * 60 * 24 * 7,
     httpOnly: false
   });
 }
@@ -32,7 +32,7 @@ export interface NourishJwtPayload {
 export function decodeJwt(token: string): NourishJwtPayload {
   try {
     const payload = token.split(".")[1];
-    const decoded = atob(payload); // browser-safe base64 decode
+    const decoded = atob(payload)
     return JSON.parse(decoded);
   } catch (err) {
     console.error("JWT decode error:", err);
@@ -59,7 +59,6 @@ export function isTokenExpired(token?: string): boolean {
   const payload = decodeJwt(token || getAuthToken() || "");
   if (!payload.exp) return true;
 
-  // JWT exp is in seconds; convert to ms
   return Date.now() >= payload.exp * 1000;
 }
 
@@ -70,11 +69,9 @@ export function isTokenValid(token?: string): boolean {
 
   const payload = decodeJwt(raw);
 
-  // Must have required fields
   if (!payload || typeof payload !== "object") return false;
   if (!payload.sub || !payload.userId || !payload.role) return false;
 
-  // Must not be expired
   if (!payload.exp) return false;
 
   const expired = Date.now() >= payload.exp * 1000;

@@ -71,8 +71,6 @@ class ApiClient {
     }
   }
 
-  // ------------ PUBLIC METHODS ------------
-
   get<T = any>(url: string): Promise<ApiResponse<T>> {
     return this._request<T>(url, { method: "GET" });
   }

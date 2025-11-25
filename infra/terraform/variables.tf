@@ -6,5 +6,5 @@ variable "project_id" {
 variable "region" {
   description = "Region for the GKE cluster"
   type        = string
-  default     = "us-central1"   # ✅ Iowa (default free-tier region)
+  default     = "us-central1"
 }
