@@ -19,7 +19,7 @@ spec:
       containers:
         # --- Spring Boot microservice ---
         - name: product-service
-          image: asia-south1-docker.pkg.dev/agile-earth-477112-t9/microservices/product-service:0.1.6
+          image: us-central1-docker.pkg.dev/analog-fastness-476914-t3/microservices/product-service:0.1.7
           imagePullPolicy: Always
           ports:
             - containerPort: 8081
@@ -73,7 +73,7 @@ spec:
           image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.11.3
           args:
             - "--port=3306"
-            - "agile-earth-477112-t9:asia-south1:online-ordering-mysql"
+            - "analog-fastness-476914-t3:us-central1:online-ordering-mysql"
           # resources:
           #   requests:
           #     cpu: "50m"
